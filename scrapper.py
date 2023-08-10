@@ -1,18 +1,89 @@
-import requests
-from bs4 import BeautifulSoup
+import time
+from tqdm import tqdm
+import pandas as pd
+from selenium import webdriver 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService 
+from webdriver_manager.chrome import ChromeDriverManager
 
-querys = ["pollo"]
+# instantiate options 
+options = webdriver.ChromeOptions() 
+# run browser in headless mode 
+options.add_argument('--headless')
+# create driver
+driver = webdriver.Chrome(options=options) 
 
-url_lists = [
-    f"https://www.jumbo.cl/busqueda?ft={querys[0]}"
-]
+# lists of data
+super = []
+name = []
+price = []
+unit = []
+brand = []
+# data dict
+data = {}
 
-url = url_lists[0]
+# terms
+terms = ['pollo', 'arroz']
+# urls dict
+urls = {'jumbo': 'https://www.jumbo.cl/busqueda?ft=',
+            'lider': 'https://www.lider.cl/supermercado/search?query='}
 
-page = requests.get(url)
-soup = BeautifulSoup(page.content, "html.parser")
+urls_dict = {}
+# create dict of urls
+for k, v in urls.items():
+    urls_dict[k] = [v + term for term in terms]
+print(urls_dict)
+print("\n"*2)
 
-results = soup.find_all("div", class_="shelf-content")
+for k, v in urls_dict.items():
+    print("\n")
+    print(f'getting data of: {k}')
+    for url in v:
+        print("\n"*2)
+        print(f'searching: {url}')
+        print("\n")
+        driver.get(url)
 
-for r in results:
-    print(r, end="\n"*2)
+        time.sleep(5)
+        if k == 'jumbo':
+            # select elements by class name
+            elements = driver.find_elements(By.CLASS_NAME, 'product-card')
+
+            for item in tqdm(elements):
+                super.append(k)
+                name.append(item.find_element(By.CLASS_NAME, 'product-card-name').text)
+                price.append(item.find_element(By.CLASS_NAME, 'prices-main-price').text)
+                unit.append(item.find_element(By.CLASS_NAME, 'unitMeasurement').text)
+                brand.append(item.find_element(By.CLASS_NAME, 'product-card-brand').text)
+
+        if k == 'lider':
+            # select elements by class name 
+            elements = driver.find_elements(By.CLASS_NAME, 'ais-Hits-item')
+
+            for item in tqdm(elements): 
+                super.append(k)
+                name.append(item.find_element(By.CLASS_NAME, 'product-card_description-wrapper').text)
+                price.append(item.find_element(By.CLASS_NAME, 'product-card__sale-price').text)
+                unit.append(0)
+                brand.append("")
+        
+        print('\n')
+        print("sleeping")
+        print('\n')
+        pbar = tqdm(total=100)
+        for i in range(10):
+            time.sleep(3)
+            pbar.update(10)
+        pbar.close()
+   
+
+data["super"] = super
+data["name"] = name
+data["price"] = price
+data["unit"] = unit
+data["brand"] = brand
+
+df = pd.DataFrame(data)
+
+print(df.shape)
+print(df.describe)
