@@ -3,15 +3,18 @@ from tqdm import tqdm
 import pandas as pd
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.service import Service as ChromeService 
 from webdriver_manager.chrome import ChromeDriverManager
 
-# instantiate options 
+
+# instantiate options
 options = webdriver.ChromeOptions() 
 # run browser in headless mode 
 options.add_argument('--headless')
 # create driver
-driver = webdriver.Chrome(options=options) 
+driver = webdriver.Chrome(options=options)
+driver.implicitly_wait(5)
 
 # lists of data
 super = []
@@ -26,7 +29,7 @@ data = {}
 terms = ['pollo', 'arroz']
 # urls dict
 urls = {'jumbo': 'https://www.jumbo.cl/busqueda?ft=',
-            'lider': 'https://www.lider.cl/supermercado/search?query='}
+        'lider': 'https://www.lider.cl/supermercado/search?query='}
 
 urls_dict = {}
 # create dict of urls
@@ -44,12 +47,18 @@ for k, v in urls_dict.items():
         print("\n")
         driver.get(url)
 
-        time.sleep(5)
+        #time.sleep(5)
         if k == 'jumbo':
             # select elements by class name
             elements = driver.find_elements(By.CLASS_NAME, 'product-card')
 
             for item in tqdm(elements):
+                try:
+                    element = item.find_element(By.CLASS_NAME, 'out-of-stock')
+                    continue
+                except NoSuchElementException:
+                    pass
+                    
                 super.append(k)
                 name.append(item.find_element(By.CLASS_NAME, 'product-card-name').text)
                 price.append(item.find_element(By.CLASS_NAME, 'prices-main-price').text)
@@ -72,10 +81,11 @@ for k, v in urls_dict.items():
         print('\n')
         pbar = tqdm(total=100)
         for i in range(10):
-            time.sleep(3)
+            time.sleep(1)
             pbar.update(10)
         pbar.close()
-   
+
+driver.quit()
 
 data["super"] = super
 data["name"] = name
