@@ -53,6 +53,7 @@ for k, v in urls_dict.items():
             elements = driver.find_elements(By.CLASS_NAME, 'product-card')
 
             for item in tqdm(elements):
+                
                 try:
                     element = item.find_element(By.CLASS_NAME, 'out-of-stock')
                     continue
