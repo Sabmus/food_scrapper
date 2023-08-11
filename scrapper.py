@@ -10,6 +10,11 @@ from selenium.common.exceptions import NoSuchElementException
 options = webdriver.ChromeOptions() 
 # run browser in headless mode 
 options.add_argument('--headless')
+#options.add_argument('--disable-notifications')
+#options.add_argument('--disable-extensions')
+options.add_argument('--log-level=3') 
+#options.add_argument('--ignore-certificate-errors')
+#options.add_argument('--ignore-ssl-errors')
 #options.add_experimental_option("excludeSwitches", ["enable-automation"])
 #options.add_experimental_option('useAutomationExtension', False)
 # create driver
@@ -38,6 +43,15 @@ for k, v in urls.items():
 print(urls_dict)
 print("\n"*2)
 
+def delay(sec):
+    print('\n')
+    print(f"delay of {sec} seconds")
+    print('\n')
+    pbar = tqdm(total=100)
+    for i in range(sec):
+        time.sleep(1)
+        pbar.update(100/sec)
+    pbar.close()
 
 def collect_jumbo(urls):
     for url in urls:
@@ -61,14 +75,7 @@ def collect_jumbo(urls):
             unit.append(item.find_element(By.CLASS_NAME, 'unitMeasurement').text)
             brand.append(item.find_element(By.CLASS_NAME, 'product-card-brand').text)
             
-        print('\n')
-        print("sleeping")
-        print('\n')
-        pbar = tqdm(total=100)
-        for i in range(10):
-            time.sleep(1)
-            pbar.update(10)
-        pbar.close()
+        delay(10)
 
 def collect_lider(urls):
     for url in urls:
@@ -77,7 +84,7 @@ def collect_lider(urls):
         print("\n"*2)
         print(f'searching: {url}')
         print("\n")
-        
+
         driver.get(url)
 
         # select elements by class name 
@@ -90,14 +97,7 @@ def collect_lider(urls):
             unit.append(0)
             brand.append("")
         
-        print('\n')
-        print("sleeping")
-        print('\n')
-        pbar = tqdm(total=100)
-        for i in range(10):
-            time.sleep(1)
-            pbar.update(10)
-        pbar.close()
+        delay(10)
 
 
 collect_jumbo(urls_dict["jumbo"])
