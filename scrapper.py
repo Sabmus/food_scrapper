@@ -4,14 +4,14 @@ import pandas as pd
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.service import Service as ChromeService 
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 # instantiate options
 options = webdriver.ChromeOptions() 
 # run browser in headless mode 
 options.add_argument('--headless')
+#options.add_experimental_option("excludeSwitches", ["enable-automation"])
+#options.add_experimental_option('useAutomationExtension', False)
 # create driver
 driver = webdriver.Chrome(options=options)
 driver.implicitly_wait(5)
@@ -53,13 +53,8 @@ for k, v in urls_dict.items():
             elements = driver.find_elements(By.CLASS_NAME, 'product-card')
 
             for item in tqdm(elements):
-                
-                try:
-                    element = item.find_element(By.CLASS_NAME, 'out-of-stock')
-                    continue
-                except NoSuchElementException:
-                    pass
-                    
+                #if(len(item.find_elements(By.CLASS_NAME, 'out-of-stock')) != 0):
+                #    continue
                 super.append(k)
                 name.append(item.find_element(By.CLASS_NAME, 'product-card-name').text)
                 price.append(item.find_element(By.CLASS_NAME, 'prices-main-price').text)
