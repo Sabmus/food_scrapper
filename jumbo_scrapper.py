@@ -27,6 +27,7 @@ name = []
 price = []
 unit = []
 brand = []
+sale = []
 # data dict
 data = {}
 
@@ -65,6 +66,12 @@ def collect_jumbo(urls):
             price.append(item.find_element(By.CLASS_NAME, 'prices-main-price').text)
             unit.append(item.find_element(By.CLASS_NAME, 'unitMeasurement').text)
             brand.append(item.find_element(By.CLASS_NAME, 'product-card-brand').text)
+
+            sale = item.find_elements(By.CLASS_NAME, 'prices-price price-box order-1')
+            if len(sale) > 0:
+                sale.append(sale[0].text)
+            else:
+                sale.append("")
             
         delay(10)
 
@@ -77,6 +84,7 @@ data["name"] = name
 data["price"] = price
 data["unit"] = unit
 data["brand"] = brand
+data["sale"] = sale
 
 df = pd.DataFrame(data)
 
