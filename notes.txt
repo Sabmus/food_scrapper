@@ -1,0 +1,1 @@
+for gsheets: https://docs.gspread.org/en/latest/user-guide.html#using-gspread-with-pandas

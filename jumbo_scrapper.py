@@ -27,7 +27,8 @@ name = []
 price = []
 unit = []
 brand = []
-sale = []
+sales = []
+with_card = []
 # data dict
 data = {}
 
@@ -69,11 +70,17 @@ def collect_jumbo(urls):
 
             sale = item.find_elements(By.CLASS_NAME, 'prices-price price-box order-1')
             if len(sale) > 0:
-                sale.append(sale[0].text)
+                sales.append(sale[0].text)
             else:
-                sale.append("")
+                sales.append("")
+
+            cards = item.find_elements(By.CLASS_NAME, 'prices-price price-box order-4')
+            if len(cards) > 0:
+                with_card.append(cards[0].text)
+            else:
+                with_card.append("")
             
-        delay(10)
+        delay(5)
 
 collect_jumbo(urls)
 
@@ -84,9 +91,10 @@ data["name"] = name
 data["price"] = price
 data["unit"] = unit
 data["brand"] = brand
-data["sale"] = sale
+data["sales"] = sales
+data["with_card"] = with_card
 
 df = pd.DataFrame(data)
 
 print(df.shape)
-print(df.describe)
+df.to_csv('results.csv', index=False)
